@@ -1,8 +1,10 @@
 #include <iostream>
 #include <chrono>
-#include <sys/mman.h>
 #include <error.h>
 #include <string.h>
+
+#include <sys/mman.h>
+#include <unistd.h>
 #include <linux/kernel-page-flags.h> // KPF_THP
 
 #include "CLI11.hpp"
@@ -155,6 +157,14 @@ int main(int argc, char* argv[]) {
     std::cout << "Benchmark result in seconds: " << (total_ns / 1000000000)
               << "." << (total_ns % 1000000000) << std::endl;
   }
+
+
+  fprintf(stderr, "================================= VMAs =======================================\n");
+  auto pid = getpid();
+  char cmd[256];
+  snprintf(cmd, 256, "cat /proc/%d/maps >> /proc/%d/fd/2", pid, pid);
+  system(cmd);
+  fprintf(stderr, "================================= VMAs =======================================\n");
   
   for (size_t i =0; i < MEM_COUNTS; i++) {
     munmap(mem_regions[i], MEM_SIZE);
