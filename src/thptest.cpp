@@ -53,6 +53,7 @@ int main(int argc, char* argv[]) {
 
   
   size_t total_num_2m_pages = 0; // large page counts
+  size_t total_num_2m_pages_in_4k = 0;
   size_t total_num_4k_pages = 0;
   size_t total_num_requested_bytes =0;
   
@@ -73,7 +74,7 @@ int main(int argc, char* argv[]) {
 
     fprintf(stderr,"[%08d %p] ", (int)i, region);
     if (thp_count.pages_available) {
-      total_num_2m_pages += thp_count.pages_set / (PAGE_SIZE_2M / PAGE_SIZE_4K);
+      total_num_2m_pages_in_4k += thp_count.pages_set;
       total_num_4k_pages += thp_count.pages_total - thp_count.pages_set;
       
       fprintf(stderr, "Source pages allocated with transparent hugepages: %4.1f%% (%lu total pages, %4.1f%% flagged)\n",
@@ -97,6 +98,7 @@ int main(int argc, char* argv[]) {
 
 
   fprintf(stderr, "================================= summary =======================================\n");
+  total_num_2m_pages = total_num_2m_pages_in_4k / (PAGE_SIZE_2M / PAGE_SIZE_4K);
   size_t total_num_bytes_4k_pages = total_num_4k_pages * PAGE_SIZE_4K;
   size_t total_num_bytes_2m_pages = total_num_2m_pages * PAGE_SIZE_2M;
   size_t total_num_allocated_bytes = total_num_bytes_4k_pages + total_num_bytes_2m_pages;
